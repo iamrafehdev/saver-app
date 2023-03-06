@@ -29,11 +29,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-
-
   @override
   initState() {
     super.initState();
+
     /// initializing tab controller and settings
     TabController cont = TabController(length: CustomBottomNavBar.tabsList.length, vsync: this);
     TabsController tabCont = Get.find<TabsController>();
@@ -41,12 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       tabCont.changeIndex(cont.index);
     });
     tabCont.initializeController(cont);
-
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,5 +68,3 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 }
-
-

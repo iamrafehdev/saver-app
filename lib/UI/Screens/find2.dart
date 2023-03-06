@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:saver/Controllers/item_controller.dart';
+import 'package:saver/Models/catagory_model.dart';
+import 'package:saver/Models/item_model.dart';
+import 'package:saver/Services/local_storage.dart';
 import 'package:saver/UI/Components/item_widget.dart';
 import 'package:saver/UI/Screens/widgets/custom_textfield.dart';
 import 'package:saver/Utils/app_assets.dart';
@@ -9,14 +12,30 @@ import 'package:saver/widgets/app_icon_field.dart';
 import 'package:saver/widgets/app_text.dart';
 import 'package:saver/widgets/sized_boxes.dart';
 
-import '../Components/heading_widget.dart';
 
-class FindPage extends StatelessWidget {
-  FindPage({super.key});
+class SearchScreen extends StatefulWidget {
+  SearchScreen({super.key});
+
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  List<ItemModel> searchedItems = [];
+
+  LocalStorageService? localStorage;
+
+  List<CatagoryModel> catagoriesList = [];
+
+  List<Map<CatagoryModel, List<ItemModel>>> itemsInCatagories = [];
 
   TextEditingController textController = TextEditingController();
 
-  bool isSearching = false;
+  @override
+  void initState() {
+    getAllItems();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,17 +64,13 @@ class FindPage extends StatelessWidget {
                     AppText("Search", bold: true, size: 20),
                   ],
                 ),
-                // Image.asset(
-                //   AppAssetsImages.moreHorizIcon,
-                //   width: 25,
-                //   fit: BoxFit.fill,
-                // ),
               ],
             ),
           ),
           body: GetBuilder<ItemController>(
-            builder: (controller) => FutureBuilder(
+            builder: (controllerx) => FutureBuilder(
                 builder: (context, snapshot) {
+
                   return Column(
                     children: [
                       Padding(
@@ -65,20 +80,9 @@ class FindPage extends StatelessWidget {
                             AppIconField(
                           controller: textController,
                           onChanged: (query) {
-
-                            // controller.searchedItems = controller.searchedItems.where((element)
-                            // => element.name.toLowerCase().contains(query.toLowerCase())).toList();
-                            // controller.update();
-
-                            if(query.isEmpty){
-                              isSearching = false;
-                            }else{
-                              controller.getFilterItems(query: query);
-                              isSearching = true;
-
-                            }
-
-                            controller.update();
+                            searchedItems =searchedItems.where((element)
+                            => element.name.toLowerCase().contains(query.toLowerCase())).toList();
+                            setState(() {});
                           },
                           label: "Search",
                           prefixIcon: Icons.search,
@@ -93,25 +97,16 @@ class FindPage extends StatelessWidget {
                             ),
                           ),
                           suffixIconPress: () {
-                            textController.clear();
-                            isSearching = false;
-                            FocusScope.of(context).unfocus();
-                            controller.update();
-                            // textController.clear();
-                            // controller.searchItems(textController.text);
-                            // FocusScope.of(context).unfocus();
-                            // print("search");
-                            // push(OnBoardingScreen());
+
                           },
                         ),
                       ),
                       Expanded(
                         child: ListView.builder(
-                            itemCount:  isSearching  ? controller.searchedFilteredItems.length : controller.searchedItems.length,
+                            itemCount:searchedItems.length,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
-                              var item = isSearching ?  controller.searchedFilteredItems[index] : controller.searchedItems[index];
-                              if (controller.searchedItems.isEmpty) {
+                              if (searchedItems.isEmpty) {
                                 return const Center(
                                   child: Text("No Item found"),
                                 );
@@ -123,10 +118,10 @@ class FindPage extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       ItemWidget(
-                                        model: item,
+                                        model:searchedItems[index],
                                         screenSize: screenSize,
                                         heading:
-                                            '${item.name}',
+                                            '${searchedItems[index].name}',
                                       ),
                                     ],
                                   ),
@@ -141,5 +136,23 @@ class FindPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<List<Map<CatagoryModel, List<ItemModel>>>> getAllItems(
+      {bool updateUi = true}) async {
+    List<ItemModel> res = await localStorage!.getAllItems();
+    itemsInCatagories = [];
+    searchedItems = res;
+    for (var i = 0; i < catagoriesList.length; i++) {
+      List<ItemModel> items = [];
+      items = res
+          .where((element) => element.catagory == catagoriesList[i].name)
+          .toList();
+      itemsInCatagories.add(Map.from({catagoriesList[i]: items}));
+    }
+    if (updateUi) {
+     setState(() {});
+    }
+    return itemsInCatagories;
   }
 }

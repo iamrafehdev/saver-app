@@ -19,11 +19,22 @@ class ItemController extends GetxController {
   String currency = "";
 
 
+
   //// services
   LocalStorageService localStorage;
   List<CatagoryModel> catagoriesList = [];
   List<Map<CatagoryModel, List<ItemModel>>> itemsInCatagories = [];
   List<ItemModel> searchedItems = [];
+  List<ItemModel> searchedFilteredItems = [];
+
+  @override
+  void onInit() {
+    print("in controller init");
+    getAllItems();
+    super.onInit();
+
+  }
+
 
   ItemController(this.localStorage) {
     initializeDb();
@@ -33,12 +44,14 @@ class ItemController extends GetxController {
     currency = SharedPrefrencesService.currency;
   }
 
+
+
   /// Methods
   void addItem(ItemModel item) async {
     var res = await localStorage.addItem(item: item);
     if (res is bool) {
       customSnackBar.showSnackbar(message: "Item Successfully added");
-      await addEventToCalendar(item);
+      // await addEventToCalendar(item);
     } else {
       customSnackBar.showSnackbar(message: "Failed with error $res");
     }
@@ -64,7 +77,15 @@ class ItemController extends GetxController {
     }
   }
 
+  void deleteCategory(CatagoryModel item) async {
+    var res = await localStorage.deleteCatagory(item);
+    print( "${item.name}  $res");
+    customSnackBar.showSnackbar(message: "Category Successfully deleted");
+    getAllICatagories();
+  }
+
   Future<List<Map<CatagoryModel, List<ItemModel>>>> getAllItems(
+
       {bool updateUi = false}) async {
     List<ItemModel> res = await localStorage.getAllItems();
     itemsInCatagories = [];
@@ -80,6 +101,14 @@ class ItemController extends GetxController {
       update();
     }
     return itemsInCatagories;
+  }
+
+
+   getFilterItems({required String query}) async {
+    List<ItemModel> res = await localStorage.getAllItems();
+    searchedFilteredItems = res.where((element)
+    => element.name.toLowerCase().contains(query.toLowerCase())).toList();
+    update();
   }
 
   void addCatagory(CatagoryModel item) async {
@@ -139,32 +168,49 @@ class ItemController extends GetxController {
 
   /// search Items
 
-  void searchItems(String query) {
-    List<ItemModel> queryItems = [];
-    if (query.isEmpty) {
-      for (var j = 0; j < itemsInCatagories.length; j++) {
-        List<ItemModel> items =
-            itemsInCatagories[j][itemsInCatagories[j].keys.first] ?? [];
-        for (var i = 0; i < items.length; i++) {
-          queryItems.add(items[i]);
-        }
-      }
-      searchedItems = queryItems;
-      update();
-      return;
-    }
-    for (var j = 0; j < itemsInCatagories.length; j++) {
-      List<ItemModel> items =
-          itemsInCatagories[j][itemsInCatagories[j].keys.first] ?? [];
-      for (var i = 0; i < items.length; i++) {
-        if (items[i].name.toLowerCase().contains(query.toLowerCase())) {
-          queryItems.add(items[i]);
-        }
-      }
-    }
-    searchedItems = queryItems;
-    update();
-  }
+   // searchItems2(String query) {
+   //  print("-------in fun");
+   //  List<ItemModel> queryItems = [];
+   //  if(query.isNotEmpty){
+   //    queryItems = searchedItems.where((element) => element.name.toLowerCase().contains(query.toLowerCase())).toList();
+   //    print("-------in query done");
+   //    searchedItems = queryItems;
+   //    print("-------in query end");
+   //    update();
+   //  }else{
+   //  getAllItems();
+   //  }
+   //    return;
+   //  }
+
+
+
+  // void searchItems(String query) {
+  //   List<ItemModel> queryItems = [];
+  //   if (query.isEmpty) {
+  //     for (var j = 0; j < itemsInCatagories.length; j++) {
+  //       List<ItemModel> items =
+  //           itemsInCatagories[j][itemsInCatagories[j].keys.first] ?? [];
+  //       for (var i = 0; i < items.length; i++) {
+  //         queryItems.add(items[i]);
+  //       }
+  //     }
+  //     searchedItems = queryItems;
+  //     update();
+  //     return;
+  //   }
+  //   for (var j = 0; j < itemsInCatagories.length; j++) {
+  //     List<ItemModel> items =
+  //         itemsInCatagories[j][itemsInCatagories[j].keys.first] ?? [];
+  //     for (var i = 0; i < items.length; i++) {
+  //       if (items[i].name.toLowerCase().contains(query.toLowerCase())) {
+  //         queryItems.add(items[i]);
+  //       }
+  //     }
+  //   }
+  //   searchedItems = queryItems;
+  //   update();
+  // }
 
   /// item cataogories total
   CatagoryTotalModel gettotalForCatagory(int index) {

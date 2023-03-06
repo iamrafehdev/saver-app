@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:saver/Controllers/tabs_controller.dart';
 import 'package:saver/Services/local_storage.dart';
 import 'package:saver/Services/shared_prefrences_service.dart';
-import 'package:saver/UI/Screens/home.dart';
 import 'package:saver/UI/tabs/tab_view.dart';
 import 'package:saver/Utils/custom_snackbar.dart';
 import 'package:saver/Utils/permissions.dart';
@@ -19,8 +18,7 @@ void main() async {
     LocalStorageService localStorageService = LocalStorageService();
     await localStorageService.initialise();
 
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        statusBarColor: Colors.white, systemNavigationBarColor: Colors.white));
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.white, systemNavigationBarColor: Colors.white));
     setSnackBarStyle();
     await SharedPrefrencesService.initialize();
     runApp(MyApp(
@@ -33,9 +31,9 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   MyApp({super.key, required this.localStorageService});
+
   LocalStorageService localStorageService;
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -46,14 +44,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: TabsScreen(),
-      // routes: {
-      //   '/home': (context) => const HomeScreen(),
-      // },
       onInit: () async {
         Get.put(TabsController());
         Get.put(ItemController(localStorageService));
       },
-      initialRoute: "/home",
     );
   }
 }

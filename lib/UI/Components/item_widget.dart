@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:req_fun/req_fun.dart';
 import 'package:saver/Controllers/item_controller.dart';
 import 'package:saver/Models/catagory_total_model.dart';
 import 'package:saver/Models/item_model.dart';
@@ -11,6 +12,7 @@ import 'package:saver/Utils/app_assets.dart';
 import 'package:saver/widgets/app_seekbar.dart';
 import 'package:saver/widgets/app_text.dart';
 import 'package:saver/widgets/sized_boxes.dart';
+import 'package:saver/widgets/text_icon.dart';
 
 class ItemWidget extends StatelessWidget {
   ItemWidget({
@@ -26,8 +28,7 @@ class ItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // double progressValue = min(model.getProgress() * 100, 100).toStringAsFixed(0)) == 0 ? :;
-    double progressValue = (double.parse(model.getProgress().toStringAsFixed(0)));
+    double progressValue = (min(model.getProgress() * 100, 100)).toStringAsFixed(0).toDouble();
     return Row(
       children: [
         Expanded(
@@ -62,20 +63,37 @@ class ItemWidget extends StatelessWidget {
                                   Container(
                                     width: 40,
                                     height: 40,
-                                    child: Image.asset(
-                                      AppAssetsImages.vehiclesIcon,
-                                      height: 40,
-                                      width: 40,
-                                      fit: BoxFit.fill,
-                                    ),
+                                    child:
+                                        // Image.asset(
+                                        //   AppAssetsImages.vehiclesIcon,
+                                        //   height: 40,
+                                        //   width: 40,
+                                        //   fit: BoxFit.fill,
+                                        // ),
+                                        AppIcon(
+                                            icon: heading == "Electronics"
+                                                ? Icons.electric_bolt
+                                                : heading == "Clothing"
+                                                    ? Icons.checkroom
+                                                    : heading == "Furniture"
+                                                        ? Icons.chair
+                                                        : heading == "Travel equipment"
+                                                            ? Icons.flight
+                                                            : heading == "Vehicles"
+                                                                ? Icons.directions_car_filled_outlined
+                                                                : heading == "Sports equipment"
+                                                                    ? Icons.sports_score
+                                                                    : Icons.api),
                                   ),
                                   SizeBoxWidth16(),
                                   AppText("${heading}"),
                                 ],
                               ),
-                              Obx(() => controller.moneyProgress.value
-                                  ? AppText("${model.getInflatedAmount().toStringAsFixed(1) + SharedPrefrencesService.currency}", color: Colors.blue)
-                                  : AppText("${model.expectedLifeSpan}m", color: Colors.blue)),
+                              AppText(
+                                "${model.getInflatedAmount().toStringAsFixed(1) + " " + SharedPrefrencesService.currency} / ${model.expectedLifeSpan}m",
+                                color: Colors.blue,
+                                size: 14.0,
+                              )
                             ],
                           ),
                           SizeBoxHeight16(),
@@ -236,21 +254,41 @@ class ItemTotalWidget extends StatelessWidget {
                                 Container(
                                   width: 40,
                                   height: 40,
-                                  child: Image.asset(
-                                    heading == "Electronics"? AppAssetsImages.electronicsIcon :
-                                    AppAssetsImages.vehiclesIcon,
-                                    height: 40,
-                                    width: 40,
-                                    fit: BoxFit.fill,
-                                  ),
+                                  child: AppIcon(
+                                      icon: heading == "Electronics"
+                                          ? Icons.electric_bolt
+                                          : heading == "Clothing"
+                                              ? Icons.checkroom
+                                              : heading == "Furniture"
+                                                  ? Icons.chair
+                                                  : heading == "Travel equipment"
+                                                      ? Icons.flight
+                                                      : heading == "Vehicles"
+                                                          ? Icons.directions_car_filled_outlined
+                                                          : heading == "Sports equipment"
+                                                              ? Icons.sports_score
+                                                              : Icons.api),
+
+                                  // Image.asset(
+                                  //   heading == "Electronics"? AppAssetsImages.electronicsIcon :
+                                  //   AppAssetsImages.vehiclesIcon,
+                                  //   height: 40,
+                                  //   width: 40,
+                                  //   fit: BoxFit.fill,
+                                  // ),
                                 ),
                                 SizeBoxWidth16(),
                                 AppText("${heading}"),
                               ],
                             ),
-                            Obx(() => controller.moneyProgress.value
-                                ? AppText("${model.totalInflatedAmount.toStringAsFixed(1)} ${SharedPrefrencesService.currency}", color: Colors.blue)
-                                : AppText("${model.totalMonths}m", color: Colors.blue)),
+                            // Obx(() => controller.moneyProgress.value
+                            //     ? AppText("${model.totalInflatedAmount.toStringAsFixed(1)} ${SharedPrefrencesService.currency}", color: Colors.blue)
+                            //     : AppText("${model.totalMonths}m", color: Colors.blue)),
+                            AppText(
+                              "${model.totalInflatedAmount.toStringAsFixed(1)} ${" "}${SharedPrefrencesService.currency} / ${model.totalMonths}m",
+                              color: Colors.blue,
+                              size: 14.0,
+                            ),
                           ],
                         ),
                         SizeBoxHeight16(),
@@ -269,6 +307,7 @@ class ItemTotalWidget extends StatelessWidget {
                                             "${(double.parse(model.totalSavedAmount.toStringAsFixed(1)) == 0 ? 0 : min(model.totalProgress, 100)).toStringAsFixed(0)}% / ${model.totalSavedAmount.toStringAsFixed(1)} ${SharedPrefrencesService.currency}",
                                             size: 12.0)
                                         : AppText(
+                                            // "${model.totalMonthsPassed}m / ${(double.parse(model.totalSavedAmount.toStringAsFixed(1)) == 0 ? 0 : min(model.totalProgress, 100)).toStringAsFixed(0)}%",
                                             "${model.totalMonthsPassed}m / ${(double.parse(model.totalSavedAmount.toStringAsFixed(1)) == 0 ? 0 : min(model.totalProgress, 100)).toStringAsFixed(0)}%",
                                             size: 12.0)),
                                   ),

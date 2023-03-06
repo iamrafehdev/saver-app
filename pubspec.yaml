@@ -44,6 +44,7 @@ dependencies:
   stacked_services: ^0.9.8
   fialogs: ^2.0.4
   req_fun: ^1.0.5
+  webview_flutter: ^4.0.6
 
 dev_dependencies:
   flutter_lints: ^2.0.0

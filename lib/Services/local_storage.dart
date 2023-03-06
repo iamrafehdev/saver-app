@@ -14,6 +14,7 @@ const String catagoriesTable = 'Catagories';
 
 class LocalStorageService {
   late Database _database;
+
   Future initialise() async {
     Directory appPath = Directory("/storage/emulated/0/Depreciator/Database/");
     if (await appPath.exists()) {
@@ -34,20 +35,16 @@ class LocalStorageService {
   }
 
   void importBackup(String filePath) async {
-    Directory appPath =
-        Directory("/storage/emulated/0/Depreciator/Database/$dbName");
+    Directory appPath = Directory("/storage/emulated/0/Depreciator/Database/$dbName");
     if (await appPath.exists()) {
     } else {
       appPath.create(recursive: true);
     }
     if (filePath.contains(".sqlite")) {
       await saveDbFile(filePath, appPath.path);
-      return customSnackBar.showSnackbar(
-          title: "Successfull",
-          message: "Please restart your application for complete restoring.");
+      return customSnackBar.showSnackbar(title: "Successfull", message: "Please restart your application for complete restoring.");
     }
-    return customSnackBar.showSnackbar(
-        title: "Sorry", message: "Please select a valid sqflite file");
+    return customSnackBar.showSnackbar(title: "Sorry", message: "Please select a valid sqflite file");
   }
 
   /// Items Queries
@@ -95,9 +92,7 @@ class LocalStorageService {
       itemsTable,
     );
     // Map data to a Transaction object
-    return transactionResults
-        .map((trans) => ItemModel.fromMap(trans as Map<String, dynamic>))
-        .toList();
+    return transactionResults.map((trans) => ItemModel.fromMap(trans as Map<String, dynamic>)).toList();
   }
 
   /// Catagories Queries
@@ -116,8 +111,8 @@ class LocalStorageService {
 
   Future deleteCatagory(CatagoryModel item) async {
     try {
-      await _database
-          .delete(catagoriesTable, where: 'id=?', whereArgs: [item.id]);
+      // await _database.delete(catagoriesTable, where: 'id=?', whereArgs: [item.id]);
+      await _database.delete(catagoriesTable, where: 'name =?', whereArgs: [item.name]);
     } catch (e) {
       return "Error: $e";
     }
@@ -129,9 +124,7 @@ class LocalStorageService {
       catagoriesTable,
     );
     // Map data to a Transaction object
-    return transactionResults
-        .map((trans) => CatagoryModel.fromMap(trans as Map<String, dynamic>))
-        .toList();
+    return transactionResults.map((trans) => CatagoryModel.fromMap(trans as Map<String, dynamic>)).toList();
   }
 }
 
@@ -154,4 +147,6 @@ String creatItemTable = '''
          pastLife integer not null,
          isLive bool not null,
          reciptImage text not null,
-         productImage text not null)''';
+         productImage text not null,
+         residualValue integer,
+         maintenanceCost integer)''';

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:req_fun/req_fun.dart';
 import 'package:saver/Extensions/widget_extentions.dart';
 import 'package:saver/Models/item_model.dart';
 import 'package:saver/UI/Components/popup_listview.dart';
@@ -39,29 +40,37 @@ class _AddItemScreenState extends State<AddItemScreen> {
   TextEditingController expiryDateCont = TextEditingController();
   TextEditingController purchaseAmountCont = TextEditingController();
   TextEditingController expectedLifeSpanCont = TextEditingController();
+  TextEditingController residualController = TextEditingController();
   TextEditingController pastLifeCont = TextEditingController(text: "0");
   TextEditingController productPhotoCont = TextEditingController();
   TextEditingController reciptPhotoCont = TextEditingController();
+  TextEditingController maintenanceCost = TextEditingController();
+  TextEditingController inflationController = TextEditingController();
   final GlobalKey _key = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+
     if (widget.item != null) {
       nameCont.text = widget.item!.name;
       catagoryCont.text = widget.item!.catagory;
       notesCont.text = widget.item!.notes;
       datePurchasedCont.text = widget.item!.datePurchased.substring(0, 10);
-      expiryDateCont.text = widget.item!.expiryDate
-          .substring(0, (widget.item?.expiryDate.length ?? 0) >= 10 ? 10 : 0);
+      expiryDateCont.text = widget.item!.expiryDate.substring(0, (widget.item?.expiryDate.length ?? 0) >= 10 ? 10 : 0);
       expectedLifeSpanCont.text = widget.item!.expectedLifeSpan.toString();
       isLive = widget.item!.isLive;
       datePurchase = widget.item!.datePurchased;
-      expiryDate = widget.item!.expiryDate;
+      // expiryDate = widget.item!.expiryDate;
       purchaseAmountCont.text = widget.item!.purchaseAmount.toString();
       pastLifeCont.text = widget.item!.pastLife.toString();
       productPhotoCont.text = widget.item!.productImage;
       reciptPhotoCont.text = widget.item!.reciptImage;
+      residualController.text = widget.item!.residualValue.toString();
+      maintenanceCost.text = widget.item!.maintenanceCost.toString();
+      DateTime expiryDate = datePurchase.toDate().addMonth(DateTime.now(), expectedLifeSpanCont.text.toInt());
+      expiryDateCont.text = expiryDate.toString().split(" ").first;
+      setState(() {});
     }
   }
 
@@ -115,17 +124,25 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         double left = details.globalPosition.dx;
                         double top = details.globalPosition.dy;
                         var res = await showPopUp(
-                            context: context,
-                            // rect: _key.location,
-                            isRect: true,
-                            left: left,
-                            top: top -22,
-                            padding: const EdgeInsets.only(top: 40),
-                            child: PopupListView(
-                                dropdownValues: controller.catagoriesList
-                                    .map((e) => e.name)
-                                    .toList(),
-                                shouldIncludeSearchBar: true));
+                          context: context,
+                          // rect: _key.location,
+                          isRect: true,
+                          left: left,
+                          top: top - 22,
+                          padding: const EdgeInsets.only(top: 10),
+                          child:
+                          // PopupListView(
+                          //   dropdownValues: controller.catagoriesList.map((e) => e.name).toList(),
+                          //   shouldIncludeSearchBar: true,
+                          // ),
+                          PopupListView(
+                            dropdownValues: controller.catagoriesList.map((e) => e.name).toList(),
+                            shouldIncludeSearchBar: true,
+                            catagoryModel: controller.catagoriesList,
+                            isDelete: true,
+                            itemController: controller,
+                          )
+                        );
                         if (res is String) {
                           catagoryCont.text = res;
                           setState(() {});
@@ -148,14 +165,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         var res = await showDatePicker(
                             context: context,
                             initialDate: DateTime.now(),
-                            firstDate: DateTime.now()
-                                .subtract(const Duration(days: 365 * 50)),
-                            lastDate: DateTime.now()
-                                .add(const Duration(days: 365 * 50)));
+                            firstDate: DateTime.now().subtract(const Duration(days: 365 * 50)),
+                            lastDate: DateTime.now().add(const Duration(days: 365 * 50)));
                         if (res is DateTime) {
                           datePurchase = res.toIso8601String();
-                          datePurchasedCont.text =
-                              DateFormat("dd-MM-yyyy").format(res);
+                          datePurchasedCont.text = DateFormat("yyyy-MM-dd").format(res);
 
                           setState(() {});
                         }
@@ -178,6 +192,17 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       controller: expectedLifeSpanCont,
                       label: "Expected Lifespan",
                       keyboardType: TextInputType.number,
+                      onChanged: (v) {
+                        if (v.toInt() > 0) {
+                          DateTime expiryDate = datePurchase.toDate().addMonth(DateTime.now(), v.toInt());
+                          // print(datePurchase.toDate());
+                          // print(expiryDate);
+                          // print(v);
+                          expiryDateCont.text = expiryDate.toString().split(" ").first;
+                          setState(() {});
+                          // expiryDateCont.text =
+                        }
+                      },
                     ),
                     SizeBoxHeight8(),
                     AppField(
@@ -185,14 +210,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       isEnable: false,
                       controller: TextEditingController(
                         text: datePurchasedCont.text.isNotEmpty
-                            ? max(
-                                    DateTime.now()
-                                            .difference(
-                                                DateTime.parse(datePurchase))
-                                            .inDays ~/
-                                        30,
-                                    0)
-                                .toStringAsFixed(0)
+                            ? max(DateTime.now().difference(DateTime.parse(datePurchase)).inDays ~/ 30, 0).toStringAsFixed(0)
                             : "0",
                       ),
                     ),
@@ -234,31 +252,47 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         hint: "0",
                         label: "Save Per Month",
                         controller: TextEditingController(
-                          text: purchaseAmountCont.text.isNotEmpty &&
-                                  expectedLifeSpanCont.text.isNotEmpty
-                              ? max(
-                                      (double.parse(purchaseAmountCont.text) /
-                                          int.parse(expectedLifeSpanCont.text)),
-                                      0)
-                                  .toStringAsFixed(2)
+                          text: purchaseAmountCont.text.isNotEmpty && expectedLifeSpanCont.text.isNotEmpty
+                              ? max((double.parse(purchaseAmountCont.text) / int.parse(expectedLifeSpanCont.text)), 0).toStringAsFixed(2)
                               : "0",
                         )),
                     SizeBoxHeight8(),
+                    AppField(
+                      controller: residualController,
+                      label: "Residual value",
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) {},
+                    ),
+                    SizeBoxHeight8(),
+                    AppField(
+                      controller: maintenanceCost,
+                      label: "Maintenance cost",
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) {},
+                    ),
+                    // SizeBoxHeight8(),
+                    // AppField(
+                    //   controller: inflationController,
+                    //   label: "Inflation",
+                    //   keyboardType: TextInputType.number,
+                    //   onChanged: (v) {},
+                    // ),
+                    SizeBoxHeight8(),
                     InkWell(
                       onTap: () async {
-                        var res = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now()
-                                .subtract(const Duration(days: 365 * 50)),
-                            lastDate: DateTime.now()
-                                .add(const Duration(days: 365 * 50)));
-                        if (res is DateTime) {
-                          expiryDate = res.toIso8601String();
-                          expiryDateCont.text =
-                              DateFormat("dd-MM-yyyy").format(res);
-                          setState(() {});
-                        }
+                        // var res = await showDatePicker(
+                        //     context: context,
+                        //     initialDate: DateTime.now(),
+                        //     firstDate: DateTime.now()
+                        //         .subtract(const Duration(days: 365 * 50)),
+                        //     lastDate: DateTime.now()
+                        //         .add(const Duration(days: 365 * 50)));
+                        // if (res is DateTime) {
+                        //   expiryDate = res.toIso8601String();
+                        //   expiryDateCont.text =
+                        //       DateFormat("dd-MM-yyyy").format(res);
+                        //   setState(() {});
+                        // }
                       },
                       child: AppField(
                         isEnable: false,
@@ -444,27 +478,25 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                   textSize: 20.0,
                                   borderRadius: 14.0,
                                   height: 45.0,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.9,
+                                  width: MediaQuery.of(context).size.width * 0.9,
                                   btnColor: Colors.blue,
                                   onPressed: () {
                                     ItemModel item = ItemModel(
-                                      id: widget.item!.id,
-                                      dateAdded: widget.item!.dateAdded,
-                                      name: nameCont.text,
-                                      catagory: catagoryCont.text,
-                                      datePurchased: datePurchase,
-                                      expectedLifeSpan:
-                                          int.parse(expectedLifeSpanCont.text),
-                                      isLive: isLive,
-                                      notes: notesCont.text,
-                                      pastLife: int.parse(pastLifeCont.text),
-                                      productImage: productPhotoCont.text,
-                                      purchaseAmount:
-                                          double.parse(purchaseAmountCont.text),
-                                      reciptImage: reciptPhotoCont.text,
-                                      expiryDate: expiryDate,
-                                    );
+                                        id: widget.item!.id,
+                                        dateAdded: widget.item!.dateAdded,
+                                        name: nameCont.text,
+                                        catagory: catagoryCont.text,
+                                        datePurchased: datePurchase,
+                                        expectedLifeSpan: int.parse(expectedLifeSpanCont.text),
+                                        isLive: isLive,
+                                        notes: notesCont.text,
+                                        pastLife: int.parse(pastLifeCont.text),
+                                        productImage: productPhotoCont.text,
+                                        purchaseAmount: double.parse(purchaseAmountCont.text),
+                                        reciptImage: reciptPhotoCont.text,
+                                        expiryDate: expiryDate,
+                                        residualValue: int.parse(residualController.text),
+                                        maintenanceCost: int.parse(maintenanceCost.text));
                                     if (widget.item != item) {
                                       print(widget.item.toString());
                                       print(item.toString());
@@ -520,13 +552,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                 onPressed: () {
                                   customSnackBar.showSnackbar(
                                     title: "Delete?",
-                                    message:
-                                        "Are you sure ypu want to delete this item?",
+                                    message: "Are you sure ypu want to delete this item?",
                                     mainButtonTitle: "Confirm",
                                     onMainButtonTapped: () async {
                                       controller.deleteItem(widget.item!);
-                                      Get.until((route) =>
-                                          Get.currentRoute == "/home");
+                                      Get.until((route) => Get.currentRoute == "/home");
                                       Get.back();
                                     },
                                   );
@@ -584,21 +614,20 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                 return;
                               }
                               ItemModel item = ItemModel(
-                                dateAdded: DateTime.now().toIso8601String(),
-                                name: nameCont.text,
-                                catagory: catagoryCont.text,
-                                datePurchased: datePurchase,
-                                expectedLifeSpan:
-                                    int.parse(expectedLifeSpanCont.text),
-                                isLive: isLive,
-                                notes: notesCont.text,
-                                pastLife: int.parse(pastLifeCont.text),
-                                productImage: productPhotoCont.text,
-                                purchaseAmount:
-                                    double.parse(purchaseAmountCont.text),
-                                reciptImage: reciptPhotoCont.text,
-                                expiryDate: expiryDate,
-                              );
+                                  dateAdded: DateTime.now().toIso8601String(),
+                                  name: nameCont.text,
+                                  catagory: catagoryCont.text,
+                                  datePurchased: datePurchase,
+                                  expectedLifeSpan: int.parse(expectedLifeSpanCont.text),
+                                  isLive: isLive,
+                                  notes: notesCont.text,
+                                  pastLife: int.parse(pastLifeCont.text),
+                                  productImage: productPhotoCont.text,
+                                  purchaseAmount: double.parse(purchaseAmountCont.text),
+                                  reciptImage: reciptPhotoCont.text,
+                                  expiryDate: expiryDate,
+                                  residualValue: int.parse(residualController.text),
+                                  maintenanceCost: int.parse(maintenanceCost.text));
                               controller.addItem(item);
                               resetControllers();
                             },
@@ -618,13 +647,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                             width: MediaQuery.of(context).size.width * 0.9,
                             btnColor: Colors.orange,
                             onPressed: () async {
-                              TextEditingController cont =
-                                  TextEditingController();
+                              TextEditingController cont = TextEditingController();
                               var res = await addNewCatagory(context, cont);
                               if (res is bool) {
-                                Get.find<ItemController>().addCatagory(
-                                    CatagoryModel(
-                                        name: cont.text.removeAllWhitespace));
+                                Get.find<ItemController>().addCatagory(CatagoryModel(name: cont.text.removeAllWhitespace));
                               }
                             },
                           )),
@@ -652,12 +678,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
     expectedLifeSpanCont.clear();
     productPhotoCont.clear();
     reciptPhotoCont.clear();
+    residualController.clear();
+    maintenanceCost.clear();
     setState(() {});
   }
 }
 
-Future<dynamic> addNewCatagory(
-    BuildContext context, TextEditingController cont) {
+Future<dynamic> addNewCatagory(BuildContext context, TextEditingController cont) {
   return showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -665,9 +692,7 @@ Future<dynamic> addNewCatagory(
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
-              controller: cont,
-              decoration: const InputDecoration(hintText: "Type Here")),
+          TextField(controller: cont, decoration: const InputDecoration(hintText: "Type Here")),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -684,8 +709,7 @@ Future<dynamic> addNewCatagory(
               const SizedBox(width: 10),
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color.fromARGB(255, 224, 78, 67)),
+                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 224, 78, 67)),
                 ),
                 onPressed: () {
                   Get.back();

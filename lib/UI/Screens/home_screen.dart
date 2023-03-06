@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:saver/UI/Components/seperator_widget.dart';
 import 'package:saver/UI/Screens/find.dart';
+import 'package:saver/UI/Screens/find2.dart';
 import 'package:saver/UI/Screens/settings.dart';
 import 'package:saver/UI/Screens/single_catagory.dart';
 import 'package:saver/Utils/app_assets.dart';
@@ -169,6 +170,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
                         children: [
                           InkWell(
                             onTap: () {
+                              // Get.to(SearchScreen());
                               Get.to(FindPage());
                             },
                             child: AppIconField(
