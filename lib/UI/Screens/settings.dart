@@ -241,6 +241,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       SizeBoxHeight4(),
+                      InkWell(
+                        onTap: () async {
+                          controller.localStorage.exportBackup();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 46,
+                                height: 46,
+                                child: Image.asset(
+                                  AppAssetsImages.importBackupIcon,
+                                  height: 40,
+                                  width: 40,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                              SizeBoxWidth8(),
+                              AppText("Export Backup", size: 16, bold: true),
+
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizeBoxHeight4(),
                       GestureDetector(
                         onTapDown: (TapDownDetails details) async {
                           double left = details.globalPosition.dx;

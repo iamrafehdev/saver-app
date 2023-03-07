@@ -90,7 +90,7 @@ class ItemWidget extends StatelessWidget {
                                 ],
                               ),
                               AppText(
-                                "${model.getInflatedAmount().toStringAsFixed(1) + " " + SharedPrefrencesService.currency} / ${model.expectedLifeSpan}m",
+                                "${SharedPrefrencesService.currency}${model.getInflatedAmount().toStringAsFixed(1)} / ${model.expectedLifeSpan}m",
                                 color: Colors.blue,
                                 size: 14.0,
                               )
@@ -109,7 +109,7 @@ class ItemWidget extends StatelessWidget {
                                       padding: const EdgeInsets.only(bottom: 1.0),
                                       child: Obx(() => controller.moneyProgress.value
                                           ? AppText(
-                                              "${model.getSavings().toStringAsFixed(1)} ${SharedPrefrencesService.currency}/${(min(model.getProgress() * 100, 100)).toStringAsFixed(0)}%",
+                                              "${(min(model.getProgress() * 100, 100)).toStringAsFixed(0)}% / ${SharedPrefrencesService.currency}${model.getSavings().toStringAsFixed(1)} / ${((DateTime.now().difference(DateTime.parse(model.datePurchased))).inDays ).toStringAsFixed(0)} d",
                                               size: 12.0)
                                           : AppText(
                                               "${model.getMonthsPassed().toInt()}m/${(min(model.getProgress() * 100, 100)).toStringAsFixed(0)}%",
@@ -285,7 +285,7 @@ class ItemTotalWidget extends StatelessWidget {
                             //     ? AppText("${model.totalInflatedAmount.toStringAsFixed(1)} ${SharedPrefrencesService.currency}", color: Colors.blue)
                             //     : AppText("${model.totalMonths}m", color: Colors.blue)),
                             AppText(
-                              "${model.totalInflatedAmount.toStringAsFixed(1)} ${" "}${SharedPrefrencesService.currency} / ${model.totalMonths}m",
+                              "${SharedPrefrencesService.currency}${model.totalInflatedAmount.toStringAsFixed(1)} / ${model.totalMonths}m",
                               color: Colors.blue,
                               size: 14.0,
                             ),
@@ -304,7 +304,7 @@ class ItemTotalWidget extends StatelessWidget {
                                     padding: const EdgeInsets.only(bottom: 1.0),
                                     child: Obx(() => controller.moneyProgress.value
                                         ? AppText(
-                                            "${(double.parse(model.totalSavedAmount.toStringAsFixed(1)) == 0 ? 0 : min(model.totalProgress, 100)).toStringAsFixed(0)}% / ${model.totalSavedAmount.toStringAsFixed(1)} ${SharedPrefrencesService.currency}",
+                                            "${(double.parse(model.totalSavedAmount.toStringAsFixed(1)) == 0 ? 0 : min(model.totalProgress, 100)).toStringAsFixed(0)}% / ${SharedPrefrencesService.currency}${model.totalSavedAmount.toStringAsFixed(1)}",
                                             size: 12.0)
                                         : AppText(
                                             // "${model.totalMonthsPassed}m / ${(double.parse(model.totalSavedAmount.toStringAsFixed(1)) == 0 ? 0 : min(model.totalProgress, 100)).toStringAsFixed(0)}%",

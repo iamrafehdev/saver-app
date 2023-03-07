@@ -110,6 +110,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    // AppButton(
+                    //   text: "Okay............",
+                    //   width: 200,
+                    //   onPressed: (){
+                    //     controller.localStorage.exportBackup();
+                    //   },
+                    // ),
+
                     Divider(
                       color: Colors.grey[400],
                     ),
@@ -124,25 +132,24 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         double left = details.globalPosition.dx;
                         double top = details.globalPosition.dy;
                         var res = await showPopUp(
-                          context: context,
-                          // rect: _key.location,
-                          isRect: true,
-                          left: left,
-                          top: top - 22,
-                          padding: const EdgeInsets.only(top: 10),
-                          child:
-                          // PopupListView(
-                          //   dropdownValues: controller.catagoriesList.map((e) => e.name).toList(),
-                          //   shouldIncludeSearchBar: true,
-                          // ),
-                          PopupListView(
-                            dropdownValues: controller.catagoriesList.map((e) => e.name).toList(),
-                            shouldIncludeSearchBar: true,
-                            catagoryModel: controller.catagoriesList,
-                            isDelete: true,
-                            itemController: controller,
-                          )
-                        );
+                            context: context,
+                            // rect: _key.location,
+                            isRect: true,
+                            left: left,
+                            top: top - 22,
+                            padding: const EdgeInsets.only(top: 10),
+                            child:
+                                // PopupListView(
+                                //   dropdownValues: controller.catagoriesList.map((e) => e.name).toList(),
+                                //   shouldIncludeSearchBar: true,
+                                // ),
+                                PopupListView(
+                              dropdownValues: controller.catagoriesList.map((e) => e.name).toList(),
+                              shouldIncludeSearchBar: true,
+                              catagoryModel: controller.catagoriesList,
+                              isDelete: true,
+                              itemController: controller,
+                            ));
                         if (res is String) {
                           catagoryCont.text = res;
                           setState(() {});
@@ -626,8 +633,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                   purchaseAmount: double.parse(purchaseAmountCont.text),
                                   reciptImage: reciptPhotoCont.text,
                                   expiryDate: expiryDate,
-                                  residualValue: int.parse(residualController.text),
-                                  maintenanceCost: int.parse(maintenanceCost.text));
+                                  residualValue: residualController.text.toInt(),
+                                  maintenanceCost: maintenanceCost.text.toInt()) ;
                               controller.addItem(item);
                               resetControllers();
                             },

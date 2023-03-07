@@ -34,6 +34,21 @@ class LocalStorageService {
     );
   }
 
+
+   exportBackup() async {
+    File dbFile = await File("/storage/emulated/0/Depreciator/Database/depreciate.sqlite");
+    Directory dir = Directory('/storage/emulated/0/Download');
+
+    if (await dir.exists() && await dbFile.exists() ) {
+      File tempFile = await dbFile.copy("/storage/emulated/0/Download/backup_depreciate.sqlite");
+      customSnackBar.showSnackbar(message: "Backup exported successfully in download folder");
+    } else {
+      print("------------------->> dir not exists");
+    }
+
+  }
+
+
   void importBackup(String filePath) async {
     Directory appPath = Directory("/storage/emulated/0/Depreciator/Database/$dbName");
     if (await appPath.exists()) {

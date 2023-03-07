@@ -251,7 +251,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizeBoxHeight8(),
-                                    AppText("Monthly Saving should be: ${controller.getTotalMonthlySavings().toStringAsFixed(1)} \$", size: 16.0),
+                                    AppText("Monthly Saving should be: \$${controller.getTotalMonthlySavings().toStringAsFixed(1)}", size: 16.0),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
@@ -277,7 +277,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
                                                       Row(
                                                         children: [
                                                           AppText(
-                                                            "\$ ${controller.gettotalForAllCatagories().totalSavedAmount.toStringAsFixed(1)}",
+                                                            "\$${controller.gettotalForAllCatagories().totalSavedAmount.toStringAsFixed(1)}",
                                                             color: Colors.white,
                                                             size: 22.0,
                                                             bold: true,
